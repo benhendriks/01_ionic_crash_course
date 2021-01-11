@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { DEFAULT_ECDH_CURVE } from 'tls';
 import { threadId } from 'worker_threads';
+import { Insomnia } from '@ionic-native/insomnia/ngx';
+
 
 @Component({
   selector: 'app-home',
@@ -27,14 +29,19 @@ export class HomePage {
 
   overallTimer: any = false;
 
+  constructor(private insomnia: Insomnia) {
+    this.insomnia.keepAwake()
+  } 
+
   startTime() {
 
     if(this.timer) {
       clearInterval(this.timer);
     }
-
+    
     if(!this.overallTimer) {
       this.progressTimer();
+      this.insomnia.keepAwake();
     }
 
     this.timer = false;
@@ -85,8 +92,20 @@ export class HomePage {
       return s;
     }
 
-    updateMyDate($event) {
-      console.log($event.split(":"));
+    stopTimer() {
+      clearInterval(this.timer);
+      clearInterval(this.overallTimer);
+      this.overallTimer = false;
+      this.timer = false;    
+      this.percent = 0;
+      this.progress = 0;
+      this.elapsed = {
+        h: '00',
+        m: '00',
+        s: '00'
+      }
+      this.insomnia.allowSleepAgain()
     }
+
   
 }
