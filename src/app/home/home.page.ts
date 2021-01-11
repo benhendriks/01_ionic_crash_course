@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { DEFAULT_ECDH_CURVE } from 'tls';
 import { threadId } from 'worker_threads';
 
 @Component({
@@ -18,7 +19,23 @@ export class HomePage {
   minutes: number = 1;
   seconds: any = 30;
 
+  elapsed: any = {
+    h: '00',
+    m: '00',
+    s: '00'
+  }
+
+  overallTimer: any = false;
+
   startTime() {
+
+    if(this.timer) {
+      clearInterval(this.timer);
+    }
+
+    if(!this.overallTimer) {
+      this.progressTimer();
+    }
 
     this.timer = false;
     this.percent = 0;
@@ -38,7 +55,38 @@ export class HomePage {
       this.percent = Math.floor((this.progress / totalSeconds) * 100);
       this.progress++;
     }, 1000)
-
   }
 
+  progressTimer() {
+    let countDownDate = new Date();
+
+    this.overallTimer = setInterval(() => {
+      let now = new Date().getTime();
+
+      // Find the distance between now an the count down date
+      let distance = now - countDownDate.getTime();
+
+      // Time calculations for hours, minutes and seconds
+
+      this.elapsed.h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      this.elapsed.m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      this.elapsed.s = Math.floor((distance % (1000 * 60)) / 1000);
+
+      this.elapsed.h = this.pad(this.elapsed.h, 2);
+      this.elapsed.m = this.pad(this.elapsed.m, 2);
+      this.elapsed.s = this.pad(this.elapsed.s, 2);
+
+    },1000)
+  }
+
+    pad(num, size) {
+      let s = num+"";
+      while (s.length < size) s = "0" + s;
+      return s;
+    }
+
+    updateMyDate($event) {
+      console.log($event.split(":"));
+    }
+  
 }
